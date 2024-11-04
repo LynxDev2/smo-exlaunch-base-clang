@@ -12,6 +12,7 @@ target_sources(subsdk9 PRIVATE
         src/main.cpp
         src/mallowConfig.cpp
         src/ActorFactory/actorPatches.cpp
+        src/ModDrawer/ModDrawer.cpp
 )
 
 target_include_directories(subsdk9 PUBLIC
