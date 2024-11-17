@@ -36,7 +36,9 @@ If you want network logging, you can make a json file at `sd:/mallow.json` with 
     // The address (hostname or IPv4) where the log server is hosted.
     "ip": "XXX.XXX.XXX.XXX",
     // The default port of choice is 3080.
-    "port": 3080
+    "port": 3080,
+    // Reconnect when a server could not be found.
+    "reconnect": false
   }
 }
 ```
