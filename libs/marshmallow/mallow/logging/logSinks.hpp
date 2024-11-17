@@ -33,7 +33,7 @@ namespace mallow::log::sink {
     };
 
     class NetworkSink : public LogSink {
-        bool initialized = false;
+        bool reconnect = false;
         s32 fileDescriptor = -1;
         nn::os::Mutex mutex;  // prevent concurrent writes to the socket
         const char *host;

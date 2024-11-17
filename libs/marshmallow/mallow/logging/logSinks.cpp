@@ -87,30 +87,33 @@ namespace mallow::log::sink {
                         [](const char* row, std::size_t size) { svcOutputDebugString(row, size); });
     }
 
-    NetworkSink::NetworkSink(const char* host, u16 port, bool tryReconnect) : mutex(false), host(host), port(port) {
-        if (connect() != ConnectResult::SUCCESS && !tryReconnect)
-            initialized = true;
+    NetworkSink::NetworkSink(const char* host, u16 port, bool tryReconnect) : reconnect(tryReconnect), mutex(false), host(host), port(port) {
+        connect();
     }
 
     void NetworkSink::send(const char* buffer, std::size_t size) {
         if (fileDescriptor < 0) {
-            if (initialized) {
+            if (!reconnect)
                 return;
-            }
             if (connect() != ConnectResult::SUCCESS)
                 return;
         }
 
         mutex.Lock();
-        nn::socket::Send(fileDescriptor, buffer, size, 0);
+        u64 res = nn::socket::Send(fileDescriptor, buffer, size, 0);
         mutex.Unlock();
+        if (res == -1) {
+            fileDescriptor = -1;
+            dbg::debugPrint("Message could not be delivered! Trying to connect to server next time.");
+        }
     }
 
     NetworkSink::ConnectResult NetworkSink::connect() {
-        if (initialized) {
-            dbg::debugPrint("NetworkSink: Already initialized.");
+        if (fileDescriptor >= 0) {
+            dbg::debugPrint("NetworkSink: Already connected.");
             return ConnectResult::ALREADY_INITIALIZED;
         }
+
         mallow::net::initializeNetwork();
 
         if (mallow::net::initializationResult().IsFailure()) {
@@ -157,7 +160,6 @@ namespace mallow::log::sink {
 
         dbg::debugPrint("NetworkSink: connected to server");
 
-        initialized = true;
         return ConnectResult::SUCCESS;
     }
 
