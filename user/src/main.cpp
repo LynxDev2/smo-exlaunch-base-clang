@@ -15,11 +15,13 @@ static void setupLogging() {
     // This sink writes to a network socket on a host computer. Raw logs are sent with no
     auto config = mallow::config::getConfig();
     if (config["logger"]["ip"].is<const char*>()) {
+        bool tryReconnect = config["logger"]["reconnect"] | false;
         static NetworkSink networkSink = NetworkSink(
             config["logger"]["ip"],
-            config["logger"]["port"] | 3080
+            config["logger"]["port"] | 3080,
+            tryReconnect
         );
-        if (networkSink.isSuccessfullyConnected())
+        if (networkSink.isSuccessfullyConnected() || tryReconnect)
             addLogSink(&networkSink);
         else
             mallow::log::logLine("Failed to connect to the network sink");
