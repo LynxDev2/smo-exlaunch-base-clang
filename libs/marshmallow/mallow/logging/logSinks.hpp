@@ -34,6 +34,7 @@ namespace mallow::log::sink {
 
     class NetworkSink : public LogSink {
         bool reconnect = false;
+        u64 lastReconnect = 0;
         s32 fileDescriptor = -1;
         nn::os::Mutex mutex;  // prevent concurrent writes to the socket
         const char *host;

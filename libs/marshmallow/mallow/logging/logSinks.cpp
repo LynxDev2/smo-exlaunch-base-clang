@@ -6,6 +6,7 @@
 #include <nn/fs.h>
 #include <nn/nifm.h>
 #include <nn/socket.hpp>
+#include <nn/time.h>
 
 namespace mallow::log::sink {
     struct TraverserLogSink : public LogSink {
@@ -95,6 +96,11 @@ namespace mallow::log::sink {
         if (fileDescriptor < 0) {
             if (!reconnect)
                 return;
+            nn::time::PosixTime currentTime{};
+            nn::time::StandardUserSystemClock::GetCurrentTime(&currentTime);
+            if (currentTime.time - lastReconnect <= 4)
+                return;
+            lastReconnect = currentTime.time;
             if (connect() != ConnectResult::SUCCESS)
                 return;
         }
@@ -103,6 +109,7 @@ namespace mallow::log::sink {
         u64 res = nn::socket::Send(fileDescriptor, buffer, size, 0);
         mutex.Unlock();
         if (res == -1) {
+            nn::socket::Close(fileDescriptor);
             fileDescriptor = -1;
             dbg::debugPrint("Message could not be delivered! Trying to connect to server next time.");
         }
@@ -134,6 +141,7 @@ namespace mallow::log::sink {
                 hostAddress = *reinterpret_cast<struct in_addr*>(hostent->h_addr_list[0]);
             } else {
                 dbg::debugPrint("NetworkSink: failed to resolve host");
+                nn::socket::Close(fileDescriptor);
                 fileDescriptor = -1;
                 return ConnectResult::RESOLVE_FAILED;
             }
@@ -150,6 +158,7 @@ namespace mallow::log::sink {
 
         if (result < 0) {
             dbg::debugPrint("NetworkSink: failed to connect to server");
+            nn::socket::Close(fileDescriptor);
             fileDescriptor = -1;
             return ConnectResult::NO_SERVER;
         }
