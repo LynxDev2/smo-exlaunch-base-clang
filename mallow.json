@@ -1,8 +1,0 @@
-{
-    "logger": {
-        "enable": true,
-        "reconnect": true,
-        "ip": "192.168.1.110",
-        "port": 3080
-    }
-}

@@ -33,6 +33,12 @@ namespace mallow::config {
         std::make_tuple(ArduinoJson::JsonDocument(&allocator), nullptr, false);
     static bool configFailed = false;
 
+    const char* calcConfigPath(){
+        if(isEmu() && pathEmu)
+            return pathEmu;
+        return path;
+    }
+
     bool isLoadedConfig() {
         return std::get<2>(config);
     }
@@ -52,11 +58,11 @@ namespace mallow::config {
             return false;
 
         nn::fs::FileHandle file;
-        auto res = nn::fs::OpenFile(&file, path, nn::fs::OpenMode_Read);
+        auto res = nn::fs::OpenFile(&file, calcConfigPath(), nn::fs::OpenMode_Read);
         if (nn::fs::ResultPathNotFound::Includes(res)) {
-            nn::fs::CreateFile(path, 0);
+            nn::fs::CreateFile(calcConfigPath(), 0);
 
-            if (nn::fs::OpenFile(&file, path, nn::fs::OpenMode_Read).IsFailure()) {
+            if (nn::fs::OpenFile(&file, calcConfigPath(), nn::fs::OpenMode_Read).IsFailure()) {
                 log::logLine("Failed to open config file");
                 configFailed = true;
                 return false;
@@ -130,11 +136,11 @@ namespace mallow::config {
 
     bool saveConfig() {
         nn::fs::FileHandle file;
-        auto res = nn::fs::OpenFile(&file, path, nn::fs::OpenMode_Write);
+        auto res = nn::fs::OpenFile(&file, calcConfigPath(), nn::fs::OpenMode_Write);
         if (nn::fs::ResultPathNotFound::Includes(res)) {
-            nn::fs::CreateFile(path, 0);
+            nn::fs::CreateFile(calcConfigPath(), 0);
 
-            if (nn::fs::OpenFile(&file, path, nn::fs::OpenMode_Write).IsFailure()) {
+            if (nn::fs::OpenFile(&file, calcConfigPath(), nn::fs::OpenMode_Write).IsFailure()) {
                 log::logLine("Failed to open config file");
                 return false;
             }

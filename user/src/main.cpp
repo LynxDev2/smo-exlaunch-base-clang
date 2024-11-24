@@ -1,15 +1,17 @@
-#include <mallow/config.hpp>
 #include <mallow/mallow.hpp>
 
 #include "ActorFactory/actorPatches.h"
 
+#include "ModOptions.h"
 #include "Scene/StageScene.h"
+#include "Library/Controller/InputFunction.h"
 
 using mallow::log::logLine;
 
 struct ScenePlayHook : public mallow::hook::Trampoline<ScenePlayHook>{
     static void Callback(StageScene* thisPtr){
-        logLine("StageScene playing");
+        if(al::isPadTriggerL(-1) && mallow::config::getConfg<ModOptions>()->myModOption)
+            logLine("You pressed L while the game was unpaused and myModOption was enabled");
         Orig(thisPtr);
     }
 };

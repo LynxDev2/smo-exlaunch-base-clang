@@ -35,8 +35,10 @@ void setupLogging(){
 struct nnMainHook : public mallow::hook::Trampoline<nnMainHook>{
     static void Callback(){
         nn::fs::MountSdCardForDebug("sd");
-        if(!mallow::config::loadConfig(true))
+        if(!mallow::config::loadConfig(true)){
             config::useDefaultConfig();
+            config::saveConfig();
+        }
         config::readConfigToStruct();
 
         setupLogging();
