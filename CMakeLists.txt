@@ -53,6 +53,9 @@ target_link_libraries(subsdk9 PUBLIC marshmallow
         -Wl,--build-id=uuid
         -Wl,-init,rtldInit
 )
+if(APPLE)
+    set(EXE_EXE "-mac")
+endif ()
 generate_npdm(subsdk9 ${CMAKE_SOURCE_DIR}/user/subsdk9.json)
 make_nso_target(subsdk9)
 set(FTP_TITLE_ID 0100000000010000 CACHE STRING "FTP Title ID")

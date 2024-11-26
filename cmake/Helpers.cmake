@@ -1,10 +1,11 @@
 function(generate_npdm target json)
     add_custom_target(${target}_npdm
-            DEPENDS ${target}
-            COMMAND ${CMAKE_SOURCE_DIR}/tools/npdmtool${EXE_EXT} ${json} ${CMAKE_BINARY_DIR}/${target}.npdm
-            BYPRODUCTS ${CMAKE_BINARY_DIR}/${target}.npdm
+            DEPENDS ${target}_npdm
+            COMMAND ${CMAKE_SOURCE_DIR}/tools/npdmtool${EXE_EXE} ${json} ${CMAKE_BINARY_DIR}/${target}.npdm
+            BYPRODUCTS ${CMAKE_SOURCE_DIR}/${target}.npdm
     )
 endfunction()
+
 
 function(make_nso_target target)
     add_custom_target(${target}_nso
@@ -14,6 +15,7 @@ function(make_nso_target target)
 endfunction()
 
 function(deploy_nso target)
+
     if (NOT TARGET ${target}_nso)
         message(FATAL_ERROR "Target ${target} does not exist")
     endif ()
