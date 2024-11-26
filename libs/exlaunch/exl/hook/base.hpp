@@ -11,11 +11,11 @@
 #define _HOOK_STATIC_CALLBACK_ASSERT() \
     static_assert(!std::is_member_function_pointer_v<CallbackFuncPtr<>>, "Callback method must be static!")
 
-namespace exl::hook {  
+namespace exl::hook {
 
     /* TODO: 32-bit. */
     namespace arch = nx64;
-    
+
     namespace {
         using Entrypoint = util::GenericFuncPtr<void, void*, void*>;
     };
@@ -29,7 +29,7 @@ namespace exl::hook {
     inline void Initialize() {
         arch::Initialize();
     }
-    
+
     template<typename InFunc, typename CbFunc>
     CbFunc Hook(InFunc hook, CbFunc callback, bool do_trampoline = false) {
 
@@ -52,8 +52,14 @@ namespace exl::hook {
 
     using InlineCtx = arch::InlineCtx;
     using InlineCallback = void (*)(InlineCtx*);
+    using InlineFloatCtx = arch::InlineFloatCtx;
+    using InlineFloatCallback = void (*)(InlineFloatCtx*);
 
     inline void HookInline(uintptr_t hook, InlineCallback callback) {
-        arch::HookInline(hook, reinterpret_cast<uintptr_t>(callback));
+        arch::HookInline(hook, reinterpret_cast<uintptr_t>(callback), false);
+    }
+
+    inline void HookInline(uintptr_t hook, InlineFloatCallback callback) {
+        arch::HookInline(hook, reinterpret_cast<uintptr_t>(callback), true);
     }
 }

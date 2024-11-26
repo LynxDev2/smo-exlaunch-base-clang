@@ -14,7 +14,7 @@ namespace mallow::config {
     "logger": {
         "enable": true,
         "reconnect": true,
-        "ip": "192.168.1.110",
+        "ip": "127.0.0.1",
         "port": 3080
     }
 }
