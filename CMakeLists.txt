@@ -19,6 +19,7 @@ add_link_options(-shared -ffunction-sections -fdata-sections)
 add_link_options(-stdlib=libc++ -nodefaultlibs -nostdlib)
 
 include(cmake/Helpers.cmake)
+include(cmake/genClangd.cmake)
 
 # Change this depending on the SDK version you are targeting
 set(NN_SDK_MAJOR 3)
@@ -57,3 +58,11 @@ generate_npdm(subsdk9 ${CMAKE_SOURCE_DIR}/user/subsdk9.json)
 make_nso_target(subsdk9)
 set(FTP_TITLE_ID 0100000000010000 CACHE STRING "FTP Title ID")
 deploy_nso_ftp(subsdk9 ${FTP_TITLE_ID})
+
+set(INCLUDE_DIRS
+ ${CMAKE_SOURCE_DIR}/tools/clang/bin/../lib/clang-runtimes/aarch64-none-elf/aarch64/include/c++/v1
+ ${CMAKE_SOURCE_DIR}/tools/clang/lib/clang/17/include
+ ${CMAKE_SOURCE_DIR}/tools/clang/bin/../lib/clang-runtimes/aarch64-none-elf/aarch64/include
+)
+
+generate_clangd_file("${CMAKE_SOURCE_DIR}/.clangd" "${INCLUDE_DIRS}")
